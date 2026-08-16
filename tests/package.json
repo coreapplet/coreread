@@ -1,0 +1,17 @@
+{
+  "name": "coreread-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Development tooling for CoreRead. Never bundled into a release.",
+  "scripts": {
+    "test": "node verify.js",
+    "test:interaction": "node interaction.js",
+    "test:browser": "node browser.js",
+    "test:all": "node verify.js && node interaction.js && node browser.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0",
+    "puppeteer-core": "^22.0.0"
+  },
+  "license": "MIT"
+}

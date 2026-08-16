@@ -1,0 +1,36 @@
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# OneDrive
+.tmp.drivedownload/
+*.~*
+
+# macOS
+.DS_Store
+._*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Release artifacts — built by build-release.sh, attached to GitHub releases
+dist/
+*.zip
+*.7z
+*.tar.gz
+*.bak
+
+# Test tooling — dev only, never shipped.
+# The lockfile is deliberately not committed: it is dev-only, it churns, and at
+# 63 KB it would be two thirds the size of the application it tests.
+node_modules/
+tests/node_modules/
+package-lock.json

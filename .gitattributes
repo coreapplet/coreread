@@ -1,0 +1,25 @@
+# Normalize to LF in the repo. Without this, git on Windows commits CRLF
+# into the shell launchers and they fail on macOS and Linux with
+# "bad interpreter: /bin/bash^M".
+
+* text=auto eol=lf
+
+# Unix launchers and scripts must be LF
+*.sh        text eol=lf
+*.command   text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+
+# Windows launcher is happier as CRLF
+*.vbs       text eol=crlf
+
+# Never touch these
+*.png       binary
+*.jpg       binary
+*.gif       binary
+*.zip       binary
+*.ico       binary
+
+# Keep the app as LF; it's served as-is over Pages
+*.html      text eol=lf
+*.md        text eol=lf

@@ -1,0 +1,81 @@
+name: Release
+
+# Push a version tag and the platform bundles build and attach themselves:
+#   git tag v1.0.0 && git push origin v1.0.0
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build (without the leading v)"
+        required: true
+        default: "1.0.0"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v6
+
+      - name: Resolve version
+        id: v
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify
+        run: |
+          # verify.js needs no dependencies and already gates everything this
+          # step used to check by hand: no external assets, no network calls,
+          # the inline script parses, and the docs still match the code.
+          node tests/verify.js
+          bash -n CoreRead.sh && bash -n CoreRead.command && bash -n build-release.sh \
+            && echo "shell scripts parse"
+
+      - name: Build platform bundles
+        run: |
+          chmod +x build-release.sh
+          ./build-release.sh "${{ steps.v.outputs.version }}"
+          ls -lh dist/
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "CoreRead v${{ steps.v.outputs.version }}"
+          tag_name: ${{ github.ref_name }}
+          draft: false
+          generate_release_notes: true
+          body: |
+            **CoreRead v${{ steps.v.outputs.version }}** — a Markdown reader in a single HTML file.
+
+            Download the bundle for your platform:
+
+            | Platform | File | Run |
+            |---|---|---|
+            | Windows | `coreread-windows.zip` | Double-click `CoreRead.vbs` |
+            | macOS | `coreread-macos.zip` | Right-click `CoreRead.command` → **Open** |
+            | Linux | `coreread-linux.zip` | `chmod +x CoreRead.sh` then run it |
+            | Any | `CoreRead.html` | Open it in any Chromium browser |
+
+            **First run:** the launchers aren't code-signed, so your OS warns you once.
+            Windows shows "Open File — Security Warning / Unknown Publisher" — click **Open**.
+            macOS blocks it — right-click the `.command` file and choose **Open**.
+            Each launcher is a short, readable text script; open it first if you'd rather check.
+
+            Built by [Coreapplet](https://www.coreapplet.com).
+          files: |
+            dist/coreread-windows.zip
+            dist/coreread-macos.zip
+            dist/coreread-linux.zip
+            dist/CoreRead.html
